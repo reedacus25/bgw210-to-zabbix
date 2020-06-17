@@ -31,4 +31,6 @@ Whatever your hostname is in Zabbix, will need to reflect in the $zabbixName var
 I have created a template for this to add to the host and properly handle the units and the items.
 I have NOT created any TRIGGERS for this template, and you can add them yourself if you want them.
 
+The template was created in v5.0, however there should be nothing preventing the template from being used in an older environment.
+
 I recommend running this in cron, at whichever interval you prefer.
