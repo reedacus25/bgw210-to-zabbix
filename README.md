@@ -2,7 +2,7 @@
 Ingesting VDSL line statistics into Zabbix
 
 This script will parse the VDSL2 statistics from the Arris BGW210-700 RG
-and store them in an InfluxDB time series database.
+and store them in an Zabbix monitoring environment.
 This script is tailored towards VDSL2 installs, not GPON/Fiber or ADSL[2+].
 I have not tested this script in a single-pair VDSL2 installation, YMMV.
 
@@ -21,7 +21,7 @@ wget
 findutils
 zabbix_sender (installed by zabbix-agent package)
 
-while this script doesn't depend on a Zabbix Server or Proxy being installed where this is run,
+While this script doesn't depend on a Zabbix Server or Proxy being installed where this is run,
 this script assumes you have an existing Zabbix environment configured.
 
 You will first need to create a host for the modem scraper to push the stats to.
