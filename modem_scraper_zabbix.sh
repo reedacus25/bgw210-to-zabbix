@@ -54,7 +54,7 @@ wget http://$modemaddress/$modemstatspath  -O $workdir/$statsfile
 html=$workdir/$statsfile
 
 #command to post to zabbix
-post2zabbix='/usr/bin/zabbix_sender -vv -z "$zabbixServer" -s "$zabbixName" -k "$zabbixKey" -o "$zabbixValue"'
+post2zabbix='/usr/bin/zabbix_sender -z "$zabbixServer" -s "$zabbixName" -k "$zabbixKey" -o "$zabbixValue"'
 
 #comments for 'variableName - lineNumber'
 
