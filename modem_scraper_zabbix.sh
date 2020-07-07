@@ -6,7 +6,6 @@
 #I have not tested this script in a single-pair VDSL2 installation, YMMV.
 
 #It has been tested working against the following firmware revisions:
-#2.6.4
 #1.10.9
 #1.9.16
 #1.8.18
@@ -18,7 +17,6 @@
 #curl
 #wget
 #findutils
-#zabbix_sender (installed by zabbix-agent package)
 
 #while this script doesn't depend on influxdb being installed where this is run,
 #this script assumes you have an existing influxdb environment and database for storing data.
@@ -38,23 +36,26 @@
 #L1 = Line 1
 #L2 = Line 2
 
-#set location for where to pull the stats down to
-workdir=/tmp
-statsfile=broadbandstatistics.ha
-
 #set zabbix server/proxy info
 zabbixServer=localhost
 zabbixName=BGW210
 
+#set location for where to pull the stats down to
+workdir=/tmp
+statsfile=broadbandstatistics.ha
+uptimefile=sysinfo.ha
 
 #pull down the stats file to working directory and set variable to the stats file
 modemaddress=192.168.1.254
 modemstatspath="cgi-bin/broadbandstatistics.ha"
+modemuptimepath="cgi-bin/sysinfo.ha"
 wget http://$modemaddress/$modemstatspath  -O $workdir/$statsfile
+wget http://$modemaddress/$modemuptimepath  -O $workdir/$uptimefile
 html=$workdir/$statsfile
+html2=$workdir/$uptimefile
 
 #command to post to zabbix
-post2zabbix='/usr/bin/zabbix_sender -z "$zabbixServer" -s "$zabbixName" -k "$zabbixKey" -o "$zabbixValue"'
+post2zabbix='/usr/bin/zabbix_sender -vv -z "$zabbixServer" -s "$zabbixName" -k "$zabbixKey" -o "$zabbixValue"'
 
 #comments for 'variableName - lineNumber'
 
@@ -252,6 +253,23 @@ zabbixKey="bgw210.l2.15m.unavail"
 zabbixValue=$line2unavail15m
 /usr/bin/zabbix_sender -vv -z "$zabbixServer" -s "$zabbixName" -k "$zabbixKey" -o "$zabbixValue"
 
+#Modem Firmware Version
+modemfirmware=$(head -n110 $html2 | tail -n1 | cut -d\> -f2 | cut -d\< -f1 | xargs)
+zabbixKey="bgw210.firmware"
+zabbixValue=$modemfirmware
+/usr/bin/zabbix_sender -vv -z "$zabbixServer" -s "$zabbixName" -k "$zabbixKey" -o "$zabbixValue"
+#Modem Uptime in DD:HH:MM:SS
+modemuptime=$(head -n121 $html2 | tail -n1 | cut -d\> -f2 | cut -d\< -f1 | xargs)
+#convert uptime to seconds
+modemDD=$(echo $modemuptime | cut -d\: -f1)
+modemHH=$(echo $modemuptime | cut -d\: -f2)
+modemMM=$(echo $modemuptime | cut -d\: -f3)
+modemSS=$(echo $modemuptime | cut -d\: -f4)
+modemseconds=$(expr $modemDD \* 86400 + $modemHH \* 3600 + $modemMM \* 60 + $modemSS)
+zabbixKey="bgw210.uptime"
+zabbixValue=$modemseconds
+/usr/bin/zabbix_sender -vv -z "$zabbixServer" -s "$zabbixName" -k "$zabbixKey" -o "$zabbixValue"
 
 #cleanup the statsfile
 rm $html
+rm $html2
