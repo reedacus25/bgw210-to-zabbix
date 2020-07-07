@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-06-17T16:47:10Z</date>
+    <date>2020-07-07T14:15:29Z</date>
     <groups>
         <group>
             <name>Modems</name>
@@ -25,6 +25,9 @@
                 </application>
                 <application>
                     <name>DSL Errors</name>
+                </application>
+                <application>
+                    <name>DSL Modem</name>
                 </application>
                 <application>
                     <name>DSL Power</name>
@@ -78,6 +81,28 @@
                             <params>1000</params>
                         </step>
                     </preprocessing>
+                </item>
+                <item>
+                    <name>Modem Firmware</name>
+                    <type>TRAP</type>
+                    <key>bgw210.firmware</key>
+                    <delay>0</delay>
+                    <history>365d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>DSL Modem</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{diff()}=1</expression>
+                            <name>Modem Firmware Changed</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>Line1 Errored Seconds last 15m</name>
@@ -608,6 +633,28 @@
                             <params>1000</params>
                         </step>
                     </preprocessing>
+                </item>
+                <item>
+                    <name>Modem Uptime</name>
+                    <type>TRAP</type>
+                    <key>bgw210.uptime</key>
+                    <delay>0</delay>
+                    <history>30d</history>
+                    <trends>730d</trends>
+                    <units>s</units>
+                    <applications>
+                        <application>
+                            <name>DSL Modem</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;10m</expression>
+                            <name>DSL Modem Restarted</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
                 </item>
             </items>
             <screens>
